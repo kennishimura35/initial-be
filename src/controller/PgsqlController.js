@@ -426,7 +426,8 @@ class PgsqlController {
       host:  req.body.PG_HOST,
       database: req.body.PG_DATABASE,
       password: req.body.PG_PASS,
-      port: req.body.PG_PORT
+      port: req.body.PG_PORT,
+      ssl: { rejectUnauthorized: false }, 
     });
 
     connection.connect((err, data) => {

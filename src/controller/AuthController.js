@@ -17,12 +17,7 @@ class AuthController {
             let expired;
             let data = ''
             let nDate = new Date()
-            
-            if(user != undefined){
-                expired = user.expired
-            }
         
-              //console.log(permissions)
             if(param.username.search(validUsernameRegexp)){
                 return Unauthorized(res, ['Field username tidak boleh berisikan karakter selain huruf, angka, atau undescore'])
             }
@@ -31,17 +26,15 @@ class AuthController {
                 Unauthorized(res, ['Login gagal, masukkan username dan password yang benar!'])
             }
             
-            else if(user.expired < nDate){
-                Unauthorized(res, ['Login gagal, akun tidak aktif(expired)'])
-            }
+            // else if(user.expired < nDate){
+            //     Unauthorized(res, ['Login gagal, akun tidak aktif(expired)'])
+            // }
             else {
                 if(md5(param.password) == user.password) {
 
                     let data = {
                         id_user: user.id_user, 
-                        expired: moment.utc(user.expired).format('YYYY-MM-DD HH:mm:ss'),
                         username: user.username,
-                        email: user.email
                     }
                     
                     data.token = createJwtToken(data)
@@ -55,6 +48,7 @@ class AuthController {
             InternalServerErr(res, ["Error during authentication"])
         }
     }
+
 
     async registration(req, res) {
         return Ok(res, ['Dummy Registrasi Sukses!'])

@@ -13,14 +13,14 @@ const { errors } = require('celebrate');
 const routes = require('./src/routes');
 const { BadRequest } = require('./src/helper/ResponseUtil');
 
-const admin = require('firebase-admin');
+// const admin = require('firebase-admin');
 // const serviceAccount = require('./super-cron-firebase-adminsdk-nu48p-647079365f.json');
 // admin.initializeApp({
 //   credential: admin.credential.cert(serviceAccount),
 //   databaseURL: 'https://super-cron-default-rtdb.asia-southeast1.firebasedatabase.app',
 // });
-const firebase = admin.database();
-const ref = firebase.ref('cron');
+// const firebase = admin.database();
+// const ref = firebase.ref('cron');
 
 const app = express()
 const port = process.env.SERVER_PORT

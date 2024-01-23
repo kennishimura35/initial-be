@@ -1,5 +1,5 @@
-const { Unauthorized } = require('../helper/ResponseUtil')
-const { verifyJwt, addConnection } = require('../helper/JwtUtil')
+const { Unauthorized, Ok } = require('../helper/ResponseUtil')
+const { verifyJwt, createRefreshToken } = require('../helper/JwtUtil')
 
 
 const getToken = (bearer) => {
@@ -9,7 +9,6 @@ const getToken = (bearer) => {
 const JwtFilter = (req, res, next) => {
     if(req.headers.authorization) {
         const token = getToken(req.headers.authorization)
-
         if(verifyJwt(req, token)) {
             next()
         } else {
@@ -20,18 +19,18 @@ const JwtFilter = (req, res, next) => {
     }    
 }
 
-const ConnFilter = (req, res, next) => {
-    if(req.body.PG_DATABASE) {
-        req.app.locals.PG_DATABASE = req?.body?.PG_DATABASE
-        req.app.locals.PG_HOST = req?.body?.PG_HOST
-        req.app.locals.PG_PORT = req?.body?.PG_PORT
-        req.app.locals.PG_USER = req?.body?.PG_USER
-        req.app.locals.PG_PASS = req?.body?.PG_PASS
-        next()
-        
+const RefreshToken = (req, res, next) => {
+    if(req.headers.authorization) {
+        const token = getToken(req.headers.authorization)
+        const data = createRefreshToken(token)
+        if(data) {
+           return Ok(res, ['refresh token created'], data) 
+        } else {
+            Unauthorized(res, 'Token is not valid')
+        }
     } else {
-        Unauthorized(res, 'Missing')
-    }    
+        Unauthorized(res, 'Token is missing')
+    }  
 }
 
 const PermissionFilter = (perm) => {
@@ -62,4 +61,4 @@ const PermissionFilter = (perm) => {
 
 
 
-module.exports = { JwtFilter, PermissionFilter, ConnFilter }
+module.exports = { JwtFilter, PermissionFilter, RefreshToken }

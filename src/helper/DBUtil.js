@@ -1,32 +1,43 @@
 const db = require('mysql-promise')()
 const mysql = require('mysql');
-const { Client } = require('pg');
-const localStorage = require("localStorage");
 require('dotenv').config();
 
+const opt = {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS
+}
+
+db.configure(opt)
 
 class Connection {
   static #instance = null;
 
-  static async getConnection(req) {
-    console.log("asdasdadas")
+  static async getConnection() {
     if (!Connection.#instance) {
       try {
-
-        console.log("ascd", req)
-        Connection.#instance = new Client({
-          user: localStorage.getItem('PG_USER'),
-          host: localStorage.getItem("PG_HOST"),
-          database: localStorage.getItem("PG_DATABASE"),
-          password: localStorage.getItem("PG_PASS"),
-          port: localStorage.getItem("PG_PORT")
+        Connection.#instance = mysql.createPool({
+          host: process.env.DB_HOST,
+          port: process.env.DB_PORT,
+          database: process.env.DB_NAME,
+          user: process.env.DB_USER,
+          password: process.env.DB_PASS,
+          timezone: process.env.DB_TIMEZONE,
         });
 
-      await Connection.#instance.connect()
-      return Connection.#instance;
+        return Connection.#instance;
 
       } catch (err) {
-        console.log(err)
+        if (Connection.#instance) {
+          try {
+            Connection.#instance.close(); 
+          } catch (err) {
+            throw new Error(`Database error - Close connection // ${err.message}`);
+          }
+        }
+        throw new Error(`Database error - Get connection ${err.message}`);
       }
       
     } else {
